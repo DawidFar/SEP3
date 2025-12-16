@@ -1,0 +1,23 @@
+openapi: 3.0.1
+info:
+  title: Online Shop API (gateway)
+  version: 1.0.0
+paths:
+  /api/products:
+    get:
+      summary: List products
+      responses:
+        '200':
+          description: OK
+  /api/orders:
+    post:
+      summary: Create order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Order created

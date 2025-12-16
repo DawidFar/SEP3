@@ -1,0 +1,22 @@
+asyncapi: '2.4.0'
+info:
+  title: Online Shop Events
+  version: '1.0.0'
+channels:
+  orders.created:
+    description: Order created events
+    publish:
+      message:
+        payload:
+          type: object
+          properties:
+            orderId:
+              type: string
+            userId:
+              type: string
+            amount:
+              type: number
+servers:
+  rabbitmq:
+    url: localhost:5672
+    protocol: amqp

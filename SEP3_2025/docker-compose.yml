@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  csharp-server:
+    build: ./src/csharp-server
+    image: csharp-server:1.0
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_URLS=http://+:5000
+  # Optional: uncomment to run Postgres locally with the project
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: vinyldb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata: {}

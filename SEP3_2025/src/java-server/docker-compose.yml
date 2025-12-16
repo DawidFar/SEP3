@@ -1,0 +1,73 @@
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  postgres-product:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: productdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+
+  postgres-order:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: orderdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+
+  mysql-payment:
+    image: mysql:8
+    environment:
+      MYSQL_DATABASE: paymentdb
+      MYSQL_ROOT_PASSWORD: root
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3307:3306"
+
+  product-service:
+    build: ./services/product-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-product:5432/productdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on: [postgres-product]
+
+  order-service:
+    build: ./services/order-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-order:5432/orderdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      RABBITMQ_HOST: rabbitmq
+    depends_on: [postgres-order, rabbitmq]
+
+  payment-service:
+    build: ./services/payment-service
+    ports:
+      - "8083:8083"
+    environment:
+      ConnectionStrings__PaymentDb: Server=mysql-payment;Database=paymentdb;Uid=root;Pwd=root;
+      RABBITMQ_HOST: rabbitmq
+    depends_on: [mysql-payment, rabbitmq]
+
+  frontend:
+    build: ./frontend/web-client
+    ports:
+      - "3000:3000"
+    depends_on: [product-service, order-service, payment-service]

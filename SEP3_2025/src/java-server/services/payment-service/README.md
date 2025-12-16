@@ -1,0 +1,1 @@
+This is a minimal .NET console app that consumes OrderCreated messages from RabbitMQ and simulates payment processing.
